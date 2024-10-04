@@ -1,1 +1,8 @@
+C:/Users/vseenivasan/Lab_1/alu.v {1 {vlog -work work -vopt C:/Users/vseenivasan/Lab_1/alu.v
+Model Technology ModelSim SE vlog 10.1b Compiler 2012.04 Apr 26 2012
+-- Compiling module alu
 
+Top level modules:
+	alu
+
+} {} {}}
