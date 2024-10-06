@@ -5,6 +5,11 @@ module alu_testbench();
   wire[31:0] result; 
   wire zero, overflow, carry, negative; 
   
+  reg[31:0] expected_result; 
+  reg ex_zero, ex_overflow, ex_carry, ex_negative; 
+  reg[31:0] testvector[0:175];
+  integer i; 
+  
   alu test_unit(
     .a(A), 
     .b(B),
@@ -16,91 +21,28 @@ module alu_testbench();
     .negative(negative)); 
     
   initial begin
-    //ADD 0+0
-    A <= 0; 
-    B <= 0; 
-    control <= 0; 
-    #100
-    //ADD 0+(-1)
-    B <= -1; 
-    #100
-    //ADD 1+(-1)
-    A <= 1; 
-    #100
-    //ADD FF+1
-    A <= 2'hFF; 
-    B <= 1;
-    #100 
-    //ADD 7FFFFFFF+1
-    A <= 8'h7FFFFFFF; 
-    B <= 1;
-    #100
-    //SUB 0-0
-    A <= 0; 
-    B <= 0; 
-    control <= 001;
-    #100 
-    //SUB 0-(-1)
-    B <= -1;
-    #100 
-    //SUB 1-1
-    A <= 1; 
-    B <= 1;
-    #100 
-    //SUB 100-1
-    A <= 100;
-    #100 
-    //SUB 80000000-1
-    A <= 80000000;
-    #100  
-    //SLT 0,0 
-    A <= 0; 
-    B <= 0; 
-    control <= 101;
-    #100 
-    //SLT 0,1
-    B <= 1; 
-    #100
-    //SLT 0,-1
-    B <= -1;
-    #100 
-    //SLT 1,0
-    A <= 1; 
-    B <= 0;
-    #100 
-    //SLT -1,0
-    A <= -1; 
-    B <= 0;
-    #100
-    //AND FFFFFFFF, FFFFFFFF
-    A <= 8'hFFFFFFFF; 
-    B <= 8'hFFFFFFFF; 
-    control <= 010;
-    #100 
-    //AND FFFFFFFF, 12345678
-    B <= 12345678; 
-    #100
-    //AND 12345678, 87654321
-    A <= 12345678; 
-    B <= 87654321; 
-    #100; 
-    //AND 00000000, FFFFFFFF
-    A <= 00000000; 
-    B <= 8'hFFFFFFFF; 
-    #100; 
-    //OR FFFFFFFF, FFFFFFFF
-    A <= 8'hFFFFFFFF; 
-    control <= 011; 
-    #100; 
-    //OR 12345678, 87654321
-    A <= 12345678; 
-    B <= 87654321; 
-    #100; 
-    //OR 00000000, FFFFFFFF; 
-    A <= 00000000; 
-    B <= 8'hFFFFFFFF; 
-    #100; 
-    //OR 00000000, 00000000; 
-    B <= 00000000; 
+  
+    $readmemh("alu.tv", testvector); 
+    for(i = 0; i < 175; i = i+8) begin
+      control = testvector[i][2:0]; 
+      A = testvector[i+1][31:0];
+      B = testvector[i+2][31:0];
+      expected_result = testvector[i+3][31:0]; 
+      ex_zero = testvector[i+4][0]; 
+      ex_overflow = testvector[i+5][0];  
+      ex_carry = testvector[i+6][0]; 
+      ex_negative = testvector[i+7][0];  
+      
+      #10;
+    
+      if((result == expected_result) && (zero == ex_zero) && (overflow == ex_overflow) && (carry == ex_carry) && (negative == ex_negative)) begin
+        $display("Test passed");  
+      end else begin 
+        $display("Test failed");
+        $display("Inputs - control: %b, A: %h, B: %h", control, A, B);  
+        $display("Outputs - result: %h, zero: %b, overflow: %b, carry: %b, negative: %b", result, zero, overflow, carry, negative); 
+        $display("Expected - result: %h, zero: %b, overflow: %b, carry: %b, negative: %b", expected_result, ex_zero, ex_overflow, ex_carry, ex_negative);  
+      end 
+    end
   end
 endmodule  

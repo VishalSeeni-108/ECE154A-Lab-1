@@ -24,6 +24,6 @@ module alu(input [31:0] a, b,
           assign result = (f[2] & f[0]) ? slt : (f[1] ? (f[0]? or_result : and_result) : (f[0]? sum : sum)); 
           assign zero = &(~result); 
           assign overflow = (~(f[0] ^ b[31] ^ a[31]) & (a[31] ^ sum[31]) & (~f[1])); 
-          assign carry = (~f[1]) & cout; 
+          assign carry = (~f[1] & ~f[2]) & cout; 
           assign negative = result[31];
 endmodule
